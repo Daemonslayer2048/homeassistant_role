@@ -1,0 +1,12 @@
+[Unit]
+Description=Home Assistant
+After=network-online.target mariadb.service
+
+[Service]
+Type=simple
+User={{ hass_user }}
+WorkingDirectory={{ hass_user_home }}
+ExecStart={{ hass_user_home }}/env/bin/hass
+
+[Install]
+WantedBy=multi-user.target

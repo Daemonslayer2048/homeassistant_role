@@ -1,0 +1,13 @@
+module hass_selinux 0.0.2;
+
+require {
+  type init_t, var_t, http_cache_port_t, mysqld_port_t, jboss_management_port_t;
+  class tcp_socket { name_connect };
+  class file { append create execute execute_no_trans ioctl lock open read rename setattr unlink write };
+}
+
+#============= init_t ==============
+allow init_t var_t:file { append create execute execute_no_trans ioctl lock open read rename setattr unlink write };
+allow init_t http_cache_port_t:tcp_socket name_connect;
+allow init_t mysqld_port_t:tcp_socket name_connect;
+allow init_t jboss_management_port_t:tcp_socket name_connect;

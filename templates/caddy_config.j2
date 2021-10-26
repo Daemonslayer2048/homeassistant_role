@@ -1,0 +1,3 @@
+{{ ansible_facts['hostname'] }}.{{ host_public_domain }} {
+  reverse_proxy * {{ groups['HomeAssistant'][0] }}:8123
+}

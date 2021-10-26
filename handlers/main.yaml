@@ -1,0 +1,10 @@
+- name: Restart HomeAssistant
+  ansible.builtin.systemd:
+    name: hass
+    state: restarted
+
+- name: Restart Caddy
+  delegate_to: "{{ groups['Caddy'][0] }}"
+  ansible.builtin.systemd:
+    name: caddy
+    state: restarted

@@ -1,0 +1,25 @@
+- name: Ping HASS
+  ansible.builtin.ping:
+
+- name: Include Install
+  include: install.yaml
+
+- name: Include Firewalld
+  include: firewalld.yaml
+
+- name: Include SELinux
+  include: selinux.yaml
+
+- name: Include Mariadb
+  include: mariadb.yaml
+
+- name: Setup HomeAssistant
+  include: hass_setup.yaml
+
+- name: Add Caddy Config for HASS
+  delegate_to: "{{ groups['Caddy'][0] }}"
+  ansible.builtin.template:
+    src: ./templates/caddy_config.j2
+    dest: /etc/caddy/sites-enabled/hass_config
+  notify:
+    - Restart Caddy

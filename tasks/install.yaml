@@ -1,0 +1,20 @@
+- name: Install HASS Requirements
+  ansible.builtin.package:
+    name:
+      - gcc
+      - gcc-c++
+      - systemd-devel
+      - python39
+      - python39-devel
+      - libffi-devel
+      - openssl-devel # Replaces libssl-dev
+      - libjpeg-devel
+      - zlib-devel # Replaces zlib1g-dev
+      - autoconf
+      - kernel-devel # Replaces build-essential
+      - make # Replaces build-essential
+      - openjpeg2 # Replaces libopenjp2-7
+      - libtiff # Replaces libtiff5
+      - tzdata
+      - mariadb-devel # Needed for python3 mysqlclient
+    state: present

@@ -1,0 +1,34 @@
+- name: Enable nis Boolean
+  ansible.posix.seboolean:
+    name: nis_enabled
+    state: yes
+    persistent: yes
+
+- name: Enable domain_can_mmap_files Boolean
+  ansible.posix.seboolean:
+    name: domain_can_mmap_files
+    state: yes
+    persistent: yes
+
+- name: Check if Custom SELinux Module is Installed
+  shell: semodule -l | grep hass_selinux
+  register: module_installed
+  ignore_errors: yes
+
+# There should be a more idempotent way to handle this
+- name: Install Custom Module
+  block:
+    - name: Copy TE to VM
+      ansible.builtin.copy:
+        src: ./files/hass_selinux.te
+        dest: /tmp/
+
+    - name: Convert TE to SELinux Module
+      shell: checkmodule -M -m -o /tmp/hass_selinux.mod /tmp/hass_selinux.te
+
+    - name: Convert SELinux Module to PP
+      shell: semodule_package -o /tmp/hass_selinux.pp -m /tmp/hass_selinux.mod
+
+    - name: Install SELinux PP File
+      shell: semodule -i /tmp/hass_selinux.pp
+  when: module_installed.rc == 1

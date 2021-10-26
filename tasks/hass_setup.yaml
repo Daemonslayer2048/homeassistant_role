@@ -1,0 +1,50 @@
+- name: Create HASS User
+  ansible.builtin.user:
+    name: "{{ hass_user }}"
+    comment: Homeassistant Service User
+    home: "{{ hass_user_home }}"
+    system: yes
+    shell: /sbin/nologin
+
+- name: Check if python39 venv exists
+  stat:
+    path: "{{ hass_user_home }}/env"
+  register: hass_pip_env
+
+- name: Manually create the initial virtualenv
+  become_user: "{{ hass_user }}"
+  become: true
+  command:
+    chdir: "{{ hass_user_home }}"
+    cmd: /usr/bin/python3.9 -m venv env
+    creates: "{{ hass_user_home }}/env"
+  when: not hass_pip_env.stat.exists
+
+- name: Install Homeassistant PIP Deps
+  ansible.builtin.pip:
+    virtualenv: "{{ hass_user_home }}/env"
+    virtualenv_python: /usr/bin/python3.9
+    name:
+      - wheel
+      - mysqlclient
+      - homeassistant
+      - pymysql
+  when: not hass_pip_env.stat.exists
+
+- name: Create Systemd Service
+  ansible.builtin.template:
+    src: ./templates/hass_service.j2
+    dest: /etc/systemd/system/hass.service
+
+- name: Enable Homeassistant Service
+  ansible.builtin.service:
+    name: "{{ hass_user }}"
+    state: started
+    enabled: yes
+
+- name: Place HASS Config on FS
+  ansible.builtin.template:
+    src: ./templates/hass_config.j2
+    dest: "{{ hass_user_home }}/.homeassistant/configuration.yaml"
+  notify:
+    - Restart HomeAssistant
