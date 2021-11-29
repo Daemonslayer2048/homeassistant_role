@@ -48,3 +48,4 @@
     dest: "{{ hass_user_home }}/.homeassistant/configuration.yaml"
   notify:
     - Restart HomeAssistant
+  when: groups['Caddy'] is defined and (groups['Caddy'] | length > 0)

@@ -1,4 +1,7 @@
+testing: True
+
 # Host Section
+hostname: hass
 host_public_domain: null.com
 
 # HomeAssistant Section
@@ -7,5 +10,7 @@ hass_user_home: /srv/homeassistant
 
 # MySQL Section
 mysql_encoding: utf8mb4
+mysql_root_password: Password1!
 mysql_application_database: homeassistant
 mysql_application_user: hass
+mysql_application_password: Password1!

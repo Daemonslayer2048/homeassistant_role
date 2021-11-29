@@ -1,38 +1,72 @@
-Role Name
-=========
+# Ansible Server NextCloud Role  
+## Summary
+__Graph:__
+``` mermaid
+graph LR;
+  subgraph Roles
+    common_role-->homeassistant_role;
+    common_role-.->caddy_role;
+  end
+  subgraph Hosts
+    homeassistant_role-->HomeAssistant;
+    caddy_role-.->Caddy;
+    Router-.Ports 80,443.->Caddy;
+    Caddy-.Port 80.->HomeAssistant;
+  end
+```
+This roles setups up a [HomeAssistant](https://www.home-assistant.io/) server. This role setup and installs Mariadb, and HomeAssistant. When a Caddy reverse proxy is provided in the ansible inventory file the HomeAssistant hosts firewall will be opened allowing caddy to access HomeAssistant on port 80, create a Caddy proxy file, etc.
 
-A brief description of the role goes here.
+## Requirements
+### ansible-galaxy
+__Collections:__
+  - [community.general](https://docs.ansible.com/ansible/latest/collections/community/general/index.html)
 
-Requirements
-------------
+__Roles:__
+  - [daemonslayer2048.common](https://github.com/Daemonslayer2048/common_role)
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Variables
+| Variable | Type | Required | Default | Example |
+|    -     |   -  |     -    |    -    |    -    |
+| [hostname](#hostname) | string | True | N/A | cloud |
+| [host_public_domain](#host_public_domain) | string | True | N/A | null.com |
+| [hass_user](#ass_user) | string | True | hass | hass |
+| [hass_user_home](#hass_user_home) | string | True | /srv/homeassistant | /srv/homeassistant |
+| [mysql_encoding](#mysql_encoding) | string | True | utf8mb4 | utf8mb4 |
+| [mysql_application_database](#mysql_application_database) | string | True | homeassistant | homeassistant |
+| [mysql_application_user](#mysql_application_user) | string | True | hass | hass |
+| [mysql_root_password](#mysql_root_password) | string | True | N/A | Password1! |
+| [mysql_application_password](#mysql_application_password) | string | True | N/A | Password1! |
 
-Role Variables
---------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+### Variable Summaries:
+#### hostname
+This is used in multiple locations to set the FQDN of the server and to be used in setting the public URL for the server when the [Caddy reverse proxy role](https://github.com/Daemonslayer2048/caddy_role) is deployed.
 
-Dependencies
-------------
+#### host_public_domain
+Completes the domain portion of the public URL with the help of the variable above.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+#### hass_user  
+The name of the user HomeAssistant will run as on the host
 
-Example Playbook
-----------------
+#### hass_user_home  
+The name of the user HomeAssistant will run as on the host
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+#### mysql_encoding
+The mysql database encoding to set, this should most likely not be changed.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+#### mysql_application_database
+The name of the database NextCloud should use.
 
-License
--------
+#### mysql_application_user
+The user Nextcloud will use to authenticate to the database.
 
-BSD
+#### mysql_root_password
+The root password to set for the Mariadb service.
 
-Author Information
-------------------
+#### mysql_application_password
+The application user NextCloud will use for authentication to the server.
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+
+## Notes:
+### Testing Issues
+  - Selinux Modules can not be tested in podman so these tests are performed outside of the stesting suite :(
